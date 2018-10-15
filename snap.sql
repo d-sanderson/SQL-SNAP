@@ -1,56 +1,59 @@
-ALTER DATABASE dsanderson3 SET utf8 COLLATE utf8_unicode_ci;
+ALTER DATABASE dsanderson3
+CHARACTER SET utf8
+COLLATE utf8_unicode_ci;
 
-DROP TABLE IF EXISTS author;
-DROP TABLE IF EXISTS tag;
+
+DROP TABLE IF EXISTS articleTag;
 DROP TABLE IF EXISTS article;
-DROP TABLE IF EXISTS articletag;
+DROP TABLE IF EXISTS tag;
+DROP TABLE IF EXISTS author;
 
 
-CREATE TABLE author ()
-		authorId BINARY(16) NOT NULL,
-		authorAvatarUrl VARCHAR(128) NOT NULL,
-		authorActivationToken VARCHAR(32) NOT NULL,
-		authorEmail VARCHAR(64) NOT NULL,
-		authorHash CHAR(98) NOT NULL,
-		authorUsername VARCHAR(32) NOT NULL,
+CREATE TABLE author (
+	authorId              BINARY(16)   NOT NULL,
+	authorAvatarUrl       VARCHAR(255),
+	authorActivationToken CHAR(32),
+	authorEmail           VARCHAR(128) NOT NULL,
+	authorHash            CHAR(97)     NOT NULL,
+	authorUsername        VARCHAR(32)  NOT NULL,
 
-PRIMARY KEY (authorId)
+	UNIQUE (authorEmail),
+	UNIQUE (authorUsername),
+	INDEX (authorEmail),
+	PRIMARY KEY (authorId)
 );
 
 CREATE TABLE tag (
-		tagId BINARY(16) NOT NULL,
-		tagName VARCHAR(16) NOT NULL,
+	tagId   BINARY(16)  NOT NULL,
+	tagName VARCHAR(32) NOT NULL,
 
-		UNIQUE(tagId)
-
-		PRIMARY KEY (tagId, tagName)
+	PRIMARY KEY (tagId)
 
 );
 
 CREATE TABLE article (
-		articleId BINARY(16) NOT NULL,
-		articleAuthorId BINARY(16) NOT NULL,
-		articleContent VARCHAR(22000) NOT NULL,
-		articleDate DATETIME(6) NOT NULL,
-		articleImage VARCHAR(128) NOT NULL,
+	articleId       BINARY(16)     NOT NULL,
+	articleAuthorId BINARY(16)     NOT NULL,
+	articleContent  VARCHAR(21000) NOT NULL,
+	articleDate     DATETIME(6)    NOT NULL,
+	articleImage    VARCHAR(128)   NOT NULL,
 
-		INDEX(articleAuthorId),
+	INDEX (articleAuthorId),
+	FOREIGN KEY (articleAuthorId) REFERENCES author (authorId),
 
-		FOREIGN KEY(articleAuthorId) REFERENCES author(authorId),
-
-		PRIMARY KEY (articleId)
+	PRIMARY KEY (articleId)
 );
 
 
 CREATE TABLE articleTag (
-		articleTagArticleId BINARY(16) NOT NULL,
-		articleTagTagId BINARY(16) NOT NULL,
+	articleTagArticleId BINARY(16) NOT NULL,
+	articleTagTagId     BINARY(16) NOT NULL,
 
-		INDEX(articleTagTagId),
+	INDEX (articleTagArticleId),
+	INDEX (articleTagTagId),
 
-		FOREIGN KEY(articleTagTagId) REFERENCES tag(tagId),
-		FOREIGN KEY(articleTagTagId) REFERENCES article(articleId),
+	FOREIGN KEY (articleTagTagId) REFERENCES tag (tagId),
+	FOREIGN KEY (articleTagArticleId) REFERENCES article (articleId),
 
-		PRIMARY KEY(articleTagArticleId, articleTagTagId)
+	PRIMARY KEY (articleTagArticleId, articleTagTagId)
 );
-
